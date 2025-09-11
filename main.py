@@ -155,7 +155,7 @@ class ZTECsiTool:
         self.target_ip_button.grid(row=row, column=2, padx=5, pady=5)
         row += 1
 
-        self.start_button = tk.Button(self.cfg_widget['frame'], text="COnfigure CSI Report", command=self.config_csi_all, width = 20)
+        self.start_button = tk.Button(self.cfg_widget['frame'], text="Configure CSI Report", command=self.config_csi_all, width = 20)
         self.start_button.grid(row=row, column=0, columnspan=3, padx=5, pady=5, sticky='w')
         row += 1
 

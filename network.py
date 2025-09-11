@@ -8,40 +8,17 @@ import time
 import tkinter.messagebox as messagebox
 
 def get_default_ip():
-    try:
-        ip_list = []
-        for info in socket.getaddrinfo(socket.gethostname(), None):
-            family, _, _, _, sockaddr = info
-            if family == socket.AF_INET:
-                ip = sockaddr[0]
-                if not ip.startswith('127.'):
-                    ip_list.append(ip)
-        for ip in ip_list:
-            if ip.startswith("192.168."):
-                return ip
-        if ip_list:
-            return ip_list[0]
-        return '127.0.0.1'    
-    except Exception:
-        return '127.0.0.1'
+    return '192.168.5.12'
 
 def get_gateway_ip():
-    local_ip = get_default_ip()
-    try:
-        parts = local_ip.split('.')
-        if len(parts) == 4:
-            parts[-1] = '1'
-            gateway_ip = '.'.join(parts)
-            return gateway_ip
-        else:
-            raise ValueError('Invalid Ip format')
-    except Exception:
-        return '192.168.1.1'
+    return '192.168.5.1'
 
 def send_udp_packet(ip, data, port=8021):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         sock.bind(('', 8022))
+
         sock.sendto(data, (ip, port))
         print(f"Send to {ip}:{port} from port 8022 -> {data.hex()}")
     except Exception as e:
@@ -60,9 +37,10 @@ def udp_ok_listener(ip, app):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     try:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         sock.bind((ip, 8022))
         print(f"Listening on {ip}:8022...")
-        while True:
+        while True:  
             data, addr = sock.recvfrom(8192)
             if data == b'OK':
                 print("get ok, device is rdy")
@@ -87,6 +65,7 @@ def udp_listener(ip, port, app):
     last_time = time.time()
 
     # try:
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     sock.bind((ip, port))
     print(f"Listening on {ip}:{port}...")
 
@@ -94,6 +73,7 @@ def udp_listener(ip, port, app):
         data, addr = sock.recvfrom(8192)
         report = parse_csi_data(data)
         if report:
+            print(f"Received packet #{recv_cnt} from {addr}, timestamp: {report['timestamp']}")
             app.update_csi_result(report['csi_i'], report['csi_q'])
             if app.is_csi_plot_updating == False:
                 threading.Thread(target=app.update_plot, daemon=True).start()
