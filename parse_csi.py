@@ -43,8 +43,8 @@ MCS_MAP = {
 
 class CSVCsiWriter:
     def __init__(self, max_records = 1000, output_dir = "data"):
-        self.max_records = max_records
-        self.output_dir = output_dir
+        self.max_records = max_records  # max records per file
+        self.output_dir = output_dir    # output directory
         self.current_count = 0
         self.part_number = 0
         self.file = None
@@ -66,16 +66,26 @@ class CSVCsiWriter:
         self.part_number += 1
     
     def _get_filenames(self):
+        # not record csi_i and csi_q
+        # return [
+        #     'magic_high', 'packet_sn', 'vendor', 'chip_id', 'timestamp',
+        #     'status', 'bandwidth', 'phy_mode', 'rx_chain_num',
+        #     'data_len_per_chain', 'tot_data_length', 'peer_mac',
+        #     'chain_rssi', "chain_phase", "agc_gain", 'mcs', 'gi_type',
+        #     'coding', 'stbc', 'beamformed', 'dcm', 'ltf_size', 'sgi', 'csi_cnt'
+        # ]
+        # record csi_i and csi_q
         return [
             'magic_high', 'packet_sn', 'vendor', 'chip_id', 'timestamp',
             'status', 'bandwidth', 'phy_mode', 'rx_chain_num',
             'data_len_per_chain', 'tot_data_length', 'peer_mac',
             'chain_rssi', "chain_phase", "agc_gain", 'mcs', 'gi_type',
-            'coding', 'stbc', 'beamformed', 'dcm', 'ltf_size', 'sgi', 'csi_cnt'
+            'coding', 'stbc', 'beamformed', 'dcm', 'ltf_size', 'sgi', 'csi_cnt', 'csi_i', 'csi_q'
         ]
 
     def write(self, report):
-        filtered = {k:v for k,v in report.items() if k not in ['csi_i', 'csi_q']}
+        # filtered = {k:v for k,v in report.items() if k not in ['csi_i', 'csi_q']} # not record csi_i and csi_q
+        filtered = {k:v for k,v in report.items()}                                  # record csi_i and csi_q
         if self.current_count >= self.max_records:
             self._new_file()
         self.writer.writerow(filtered)

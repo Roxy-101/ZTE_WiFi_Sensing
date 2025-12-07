@@ -324,6 +324,12 @@ class ZTECsiTool:
         csi_i = self.current_csi_result.get('csi_i')
         csi_q = self.current_csi_result.get('csi_q')
 
+
+        if all(val == 0 for val in csi_i[:256]) and all(val == 0 for val in csi_q[:256]):
+            print("前 256 部分的 i 和 q 数据都是 0")
+        else:
+            print("前 256 部分的 i 和 q 数据存在非 0 值")
+
         if csi_i is None or csi_q is None:
             return
         

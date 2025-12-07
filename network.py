@@ -7,9 +7,11 @@ import threading
 import time
 import tkinter.messagebox as messagebox
 
+# control PC ip
 def get_default_ip():
     return '192.168.5.12'
 
+# ZTE gateway ip
 def get_gateway_ip():
     return '192.168.5.1'
 
@@ -59,7 +61,7 @@ def udp_ok_listener(ip, app):
 
 def udp_listener(ip, port, app):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    csv_writer = CSVCsiWriter(max_records = 10000)
+    csv_writer = CSVCsiWriter(max_records = 100000000000)
     recv_cnt = 0
     report_cnt = 0
     last_time = time.time()
